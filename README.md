@@ -11,7 +11,7 @@ git clone https://github.com/akan72/onchain
 cd onchain
 ```
 
-To set up our virtual environment, run `make install` or the following:
+To set up our virtual environment for the first time, run `make install` or the following:
 
 ```{bash}
 python3 -m venv env
@@ -19,6 +19,8 @@ source env/bin/activate
 python -m pip install --upgrade pip
 pip install -r requirements.txt
 ```
+
+For future runs, we only need to execute `source env/bin/activate`.
 
 Set up your Project ID for using Infura's API:
 
