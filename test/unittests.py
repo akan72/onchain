@@ -20,11 +20,17 @@ class TestRunner(unittest.TestCase):
     def test_validate_input_address_simple(self):
         self.assertIsNone(validate_input_address("test"))
 
-    def test_validate_input_address_vitalik(self):
+    def test_validate_input_address_vitalik_no_prefix(self):
+        vitalik = "d8dA6BF26964aF9D7eEd9e03E53415D37aA96045"
+        res = validate_input_address(vitalik)
+
+        self.assertEqual(res, "0x" + vitalik)
+
+    def test_validate_input_address_vitalik_prefix(self):
         vitalik = "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045"
         res = validate_input_address(vitalik)
 
-        self.assertEquals(res, vitalik[2:])
+        self.assertEqual(res, vitalik)
 
     def test_1(self):
         """Test 1 Description"""
