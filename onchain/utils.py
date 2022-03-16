@@ -4,7 +4,8 @@ Utility functions for securing project keys, parsing data etc.
 
 import os
 import sys
-from typing import Optional
+import requests
+from typing import Optional, Union
 
 from onchain import config
 
@@ -78,3 +79,47 @@ def validate_input_address(address: str) -> Optional[str]:
     # TODO: Potentially an ENS address, can use the Web3 API for this
     print(f"'{address}' is not a valid address!")
     return None
+
+def get_balance(address: str, alchemy_request_url: str, block_num: str = "latest"):
+    """Get the current balance of an address in Ether
+    """
+    payload = {
+        "jsonrpc": "2.0",
+        "id": 0,
+        "method": "eth_getBalance",
+        "params": [
+            address,
+            block_num
+        ]
+    }
+
+    response = requests.post(alchemy_request_url, json=payload)
+
+    if response.status_code == 200:
+        response = response.json()
+        eth_result = convert_wei_to_ether(response['result'])
+
+        print(f"Ether balance as of block {block_num} for address {address} is {eth_result} Ether")
+        return eth_result
+    else:
+        print(f"Status code {response.status_code} returned when fetching balance for address {address}")
+
+        response = response.json()
+        if "error" in response:
+            print(f"Error {response['error']}")
+        return None
+
+
+def convert_wei_to_ether(wei: Union[str, float]) -> float:
+    """
+    """
+    if isinstance(wei, str) and is_hexadecimal(wei):
+        decimal_wei = int(wei, 16)
+        assert decimal_wei >=0
+
+        return decimal_wei / (10**18)
+
+    elif isinstance(wei, float):
+        assert wei >= 0
+
+        return wei / (10**18)
