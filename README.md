@@ -11,7 +11,7 @@ git clone https://github.com/akan72/onchain
 cd onchain
 ```
 
-Set up our virtual environment:
+To set up our virtual environment, run `make install` or the following:
 
 ```{bash}
 python3 -m venv env
@@ -19,6 +19,14 @@ source env/bin/activate
 python -m pip install --upgrade pip
 pip install -r requirements.txt
 ```
+
+Set up your Project ID for using Infura's API:
+
+```{bash}
+export INFURA_PROJECT_ID=<INFURA_PROJECT_ID>
+```
+
+or add it to the INFURA_PROJECT_ID variable in `onchain/config.py`
 
 Deactivate the venv when we're done:
 
