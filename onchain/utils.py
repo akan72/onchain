@@ -16,20 +16,20 @@ def get_alchemy_request_url() -> str:
         Request URL used to query Alchemy's API
     """
     try:
-        alchemy_project_id = os.environ["ALCHEMY_PROJECT_ID"]
+        alchemy_api_key = os.environ["ALCHEMY_API_KEY"]
     except KeyError:
-        print("ALCHEMY_PROJECT_ID env variable not set! Trying from config.py.")
+        print("ALCHEMY_API_KEY env variable not set! Trying from config.py.")
 
         try:
-            alchemy_project_id = config.ALCHEMY_PROJECT_ID
+            alchemy_api_key = config.ALCHEMY_API_KEY
         except AttributeError:
-            print("ALCHEMY_PROJECT_ID in config.py not set! Exiting.")
+            print("ALCHEMY_API_KEY in config.py not set! Exiting.")
 
             sys.exit(0)
 
-    print("Successfully found ALCHEMY_PROJECT_ID!")
+    print("Successfully found ALCHEMY_API_KEY!")
 
-    alchemy_request_url = f"https://eth-mainnet.alchemyapi.io/v2/{alchemy_project_id}"
+    alchemy_request_url = f"https://eth-mainnet.alchemyapi.io/v2/{alchemy_api_key}"
     return alchemy_request_url
 
 
