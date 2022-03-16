@@ -66,13 +66,14 @@ def validate_input_address(address: str) -> Optional[str]:
         Sanitized address prefixed by "0x", or None if the input is not a valid address
     """
 
-    # Add "0x" prefix to hex addresses for consumption by Alchemy's APIs
-    if len(address) == 40 and is_hexadecimal(address):
-        return "0x" + address
+    # Validate if addresses are in hexadecimal format
+    if is_hexadecimal(address):
+        # Add "0x" prefix to hex addresses for consumption by Alchemy's APIs if necessary
+        if len(address) == 40:
+            return "0x" + address
 
-    # Validate addresses already prefixed with "0x"
-    if len(address) == 42 and address[0:2] == "0x" and is_hexadecimal(address[2:]):
-        return address
+        if len(address) == 42:
+            return address
 
     # TODO: Potentially an ENS address, can use the Web3 API for this
     print(f"'{address}' is not a valid address!")

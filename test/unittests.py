@@ -17,6 +17,9 @@ class TestRunner(unittest.TestCase):
     def test_is_hexadecimal_true(self):
         self.assertTrue(is_hexadecimal('01af'))
 
+    def test_is_hexadecimal_true(self):
+        self.assertTrue(is_hexadecimal('0x01af'))
+
     def test_validate_input_address_simple(self):
         self.assertIsNone(validate_input_address("test"))
 
