@@ -8,29 +8,29 @@ from typing import Optional
 
 from onchain import config
 
-def get_infura_request_url() -> str:
-    """Build the request URL for querying Infura either through an
+def get_alchemy_request_url() -> str:
+    """Build the request URL for querying Alchemy either through an
     env variable or stored as a variable within config.py.
 
     Returns:
-        Request URL used to query Infura's API
+        Request URL used to query Alchemy's API
     """
     try:
-        infura_project_id = os.environ["INFURA_PROJECT_ID"]
+        alchemy_project_id = os.environ["ALCHEMY_PROJECT_ID"]
     except KeyError:
-        print("INFURA_PROJECT_ID env variable not set! Trying from config.py.")
+        print("ALCHEMY_PROJECT_ID env variable not set! Trying from config.py.")
 
         try:
-            infura_project_id = config.INFURA_PROJECT_ID
+            alchemy_project_id = config.ALCHEMY_PROJECT_ID
         except AttributeError:
-            print("INFURA_PROJECT_ID in config.py not set! Exiting.")
+            print("ALCHEMY_PROJECT_ID in config.py not set! Exiting.")
 
             sys.exit(0)
 
-    print("Successfully found INFURA_PROJECT_ID!")
+    print("Successfully found ALCHEMY_PROJECT_ID!")
 
-    infura_request_url = f"https://mainnet.infura.io/v3/{infura_project_id}"
-    return infura_request_url
+    alchemy_request_url = f"https://eth-mainnet.alchemyapi.io/v2/{alchemy_project_id}"
+    return alchemy_request_url
 
 
 def is_hexadecimal(address: str) -> bool:

@@ -3,7 +3,7 @@ import pandas as pd
 
 import onchain
 from onchain.utils import (
-    get_infura_request_url,
+    get_alchemy_request_url,
     is_hexadecimal,
     validate_input_address,
 )

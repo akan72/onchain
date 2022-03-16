@@ -22,13 +22,13 @@ pip install -r requirements.txt
 
 For future runs, we only need to execute `source env/bin/activate`.
 
-Set up your Project ID for using Infura's API:
+Set up your Project ID for using [Alchemy's API](https://docs.alchemy.com/alchemy/):
 
 ```{bash}
-export INFURA_PROJECT_ID=<INFURA_PROJECT_ID>
+export ALCHEMY_PROJECT_ID=<ALCHEMY_PROJECT_ID>
 ```
 
-or add it to the INFURA_PROJECT_ID variable in `onchain/config.py`
+or add it to the ALCHEMY_PROJECT_ID variable in `onchain/config.py`
 
 Deactivate the venv when we're done:
 
