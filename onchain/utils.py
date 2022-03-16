@@ -6,8 +6,7 @@ import os
 import sys
 from typing import Optional
 
-import config
-
+from onchain import config
 
 def get_infura_request_url() -> str:
     """Build the request URL for querying Infura either through an
@@ -71,8 +70,8 @@ def validate_input_address(address: str) -> Optional[str]:
     if len(address) == 42 and address[0:2] == "0x":
         address = address[2:]
 
-    if len(address) == 40:
-        return is_hexadecimal(address)
+    if len(address) == 40 and is_hexadecimal(address):
+        return address
 
     # TODO: Potentially an ENS address, can use the Web3 API for this
     print(f"'{address}' is not a valid address!")
