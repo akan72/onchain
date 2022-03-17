@@ -142,6 +142,55 @@ def get_balance(
         return None
 
 
+def get_transaction_history(
+    address: str,
+    alchemy_request_url: str,
+    is_from: bool,
+    session: requests.Session,
+) -> Optional[float]:
+    """Parse the transaction history for a given address.
+
+    Includes both completed and failed transactions.
+    """
+
+    if is_from:
+        address_type = "fromAddress"
+    else:
+        address_type = "toAddress"
+
+    payload = {
+        "jsonrpc": "2.0",
+        "id": 0,
+        "method": "alchemy_getAssetTransfers",
+        "params": [
+            {
+                # TODO: Implement custom "from" block to start
+                "fromBlock": f"0x0",
+                "toBlock": "latest",
+                f"{address_type}": f"{address}",
+                "category": ["external", "internal", "erc20"],
+                "excludeZeroValue": False
+            }
+        ],
+    }
+
+    try:
+        response = session.post(alchemy_request_url, json=payload)
+        response.raise_for_status()
+        response_json = response.json()
+
+        # Sometimes Alchemy will still return 200 when an error is thrown
+        # for this method, so we need to do some explicit checks
+        if response.status_code == '200' and 'error' in response_json or 'result' not in response_json:
+            print(f"Status Code {response.status_code} returned with error: {response_json}")
+            return None
+
+        transfers = response_json['result']['transfers']
+        return transfers
+    except requests.exceptions.HTTPError as e:
+        print(e)
+        return None
+
 def convert_wei_to_ether(wei: Union[str, float]) -> float:
     """
     """
