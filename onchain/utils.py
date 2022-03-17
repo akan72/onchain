@@ -109,7 +109,7 @@ def get_balance(
     address: str,
     alchemy_request_url: str,
     session: requests.Session,
-    block_num: str = "latest"
+    block_num: str,
 ) -> Optional[float]:
     """Get the current balance of an address in Ether
     """
@@ -147,6 +147,7 @@ def get_transaction_history(
     alchemy_request_url: str,
     is_from: bool,
     session: requests.Session,
+    block_num: str,
 ) -> Optional[float]:
     """Parse the transaction history for a given address.
 
@@ -166,7 +167,7 @@ def get_transaction_history(
             {
                 # TODO: Implement custom "from" block to start
                 "fromBlock": f"0x0",
-                "toBlock": "latest",
+                "toBlock": f"{block_num}",
                 f"{address_type}": f"{address}",
                 "category": ["external", "internal", "erc20"],
                 "excludeZeroValue": False
