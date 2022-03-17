@@ -5,7 +5,7 @@ Utility functions for securing project keys, parsing data etc.
 import os
 import sys
 from datetime import datetime
-from typing import Optional, Union
+from typing import Optional, Union, List
 
 import requests
 import pandas as pd
@@ -149,7 +149,7 @@ def get_transaction_history(
     is_from: bool,
     session: requests.Session,
     block_num: str,
-) -> Optional[float]:
+) -> Optional[List]:
     """Parse the transaction history for a given address.
 
     Includes both completed and failed transactions.
