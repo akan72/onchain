@@ -130,8 +130,13 @@ def get_balance(
         response_json = response.json()
 
         # Sometimes Alchemy will still return 200 when an error is thrown
-        # for this method, so we need to do some explicit checks
-        if response.status_code == '200' and 'error' in response_json or 'result' not in response_json:
+        # for this method due to an "Internal data store error",
+        # so we need to do some explicit checks
+        if (
+            (response.status_code == '200' and 'error' in response_json)
+            or ('result' not in response_json)
+        ):
+
             print(f"Status Code {response.status_code} returned with error: {response_json}")
             return None
 
@@ -167,7 +172,7 @@ def get_transaction_history(
         "params": [
             {
                 # TODO: Implement custom "from" block to start
-                "fromBlock": f"0x0",
+                "fromBlock": "0x0",
                 "toBlock": f"{block_num}",
                 f"{address_type}": f"{address}",
                 "category": ["external", "internal", "erc20"],
@@ -182,8 +187,12 @@ def get_transaction_history(
         response_json = response.json()
 
         # Sometimes Alchemy will still return 200 when an error is thrown
-        # for this method, so we need to do some explicit checks
-        if response.status_code == '200' and 'error' in response_json or 'result' not in response_json:
+        # for this method due to an "Internal data store error",
+        # so we need to do some explicit checks
+        if (
+            (response.status_code == '200' and 'error' in response_json)
+            or ('result' not in response_json)
+        ):
             print(f"Status Code {response.status_code} returned with error: {response_json}")
             return None
 
