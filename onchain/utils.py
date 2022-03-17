@@ -4,6 +4,7 @@ Utility functions for securing project keys, parsing data etc.
 
 import os
 import sys
+from datetime import datetime
 from typing import Optional, Union
 
 import requests
@@ -81,7 +82,37 @@ def validate_input_address(address: str) -> Optional[str]:
     print(f"'{address}' is not a valid address!")
     return None
 
-def get_balance(address: str, alchemy_request_url: str, block_num: str = "latest"):
+
+def get_latest_block(alchemy_request_url: str) -> Optional[str]:
+    """
+    """
+    payload = {
+        "jsonrpc": "2.0",
+        "id": 0,
+        "method": "eth_blockNumber",
+        "params": [],
+    }
+
+    response = requests.post(alchemy_request_url, json=payload)
+    response_json = response.json()
+
+    # Sometimes Alchemy will still return 200 when an error is thrown
+    if response.status_code == 200 and 'error' not in response_json:
+        latest_block = response_json['result']
+
+        print(f"Latest block as of time {str(datetime.now())} is {latest_block}")
+        return latest_block
+
+    if "error" in response_json:
+        print(f"Status Code {response.status_code} returned with error: {response_json['error']}")
+    return None
+
+
+def get_balance(
+    address: str,
+    alchemy_request_url: str,
+    block_num: str = "latest"
+) -> Optional[float]:
     """Get the current balance of an address in Ether
     """
     payload = {
@@ -95,22 +126,20 @@ def get_balance(address: str, alchemy_request_url: str, block_num: str = "latest
     }
 
     response = requests.post(alchemy_request_url, json=payload)
+    response_json = response.json()
 
-    if response.status_code == 200:
-        response = response.json()
-        eth_result = convert_wei_to_ether(response['result'])
+    # Sometimes Alchemy will still return 200 when an error is thrown
+    if response.status_code == 200 and 'error' not in response_json:
+        eth_result = convert_wei_to_ether(response_json['result'])
 
-        print(f"Ether balance as of block {block_num} for address {address} is {eth_result} Ether")
+        print(f"Ether balance as of block {block_num} for {address} is {eth_result} Ether")
         return eth_result
 
     # Assuming that if a status code other than 200 is returned, there has been an error
-    print(f"""Status code {response.status_code}
-          returned when fetching balance for address {address}
-    """)
+    print(f"Status Code {response.status_code} returned when fetching balance for {address}")
 
-    response = response.json()
-    if "error" in response:
-        print(f"Error {response['error']}")
+    if "error" in response_json:
+        print(f"Error {response_json['error']}")
     return None
 
 
