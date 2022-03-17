@@ -23,6 +23,14 @@ class TestRunner(unittest.TestCase):
     def test_validate_input_address_simple(self):
         self.assertIsNone(validate_input_address("test"))
 
+    def test_validate_input_address_correct_length(self):
+        address = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        self.assertTrue(validate_input_address(address))
+
+    def test_validate_input_address_correct_length(self):
+        address = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaz"
+        self.assertIsNone(validate_input_address(address))
+
     def test_validate_input_address_vitalik_no_prefix(self):
         vitalik = "d8dA6BF26964aF9D7eEd9e03E53415D37aA96045"
         res = validate_input_address(vitalik)
@@ -35,17 +43,10 @@ class TestRunner(unittest.TestCase):
 
         self.assertEqual(res, vitalik)
 
-    def test_1(self):
-        """Test 1 Description"""
+    def assert_output_type(self):
+        """Test to ensure that the script output is a `pd.DataFrame`"""
+        # self.assertIsInstance(..., pd.DataFrame)
         pass
-
-    def test_2(self):
-        """Test 2 Description"""
-        pass
-
-    # def assert_output_type(self):
-    #     """Test to ensure that the script output is a `pd.DataFrame`"""
-    #     self.assertIsInstance(..., pd.DataFrame)
 
 if __name__ == "__main__":
     unittest.main()

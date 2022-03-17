@@ -4,8 +4,9 @@ Utility functions for securing project keys, parsing data etc.
 
 import os
 import sys
-import requests
 from typing import Optional, Union
+
+import requests
 
 from onchain import config
 
@@ -101,25 +102,30 @@ def get_balance(address: str, alchemy_request_url: str, block_num: str = "latest
 
         print(f"Ether balance as of block {block_num} for address {address} is {eth_result} Ether")
         return eth_result
-    else:
-        print(f"Status code {response.status_code} returned when fetching balance for address {address}")
 
-        response = response.json()
-        if "error" in response:
-            print(f"Error {response['error']}")
-        return None
+    # Assuming that if a status code other than 200 is returned, there has been an error
+    print(f"""Status code {response.status_code}
+          returned when fetching balance for address {address}
+    """)
+
+    response = response.json()
+    if "error" in response:
+        print(f"Error {response['error']}")
+    return None
 
 
 def convert_wei_to_ether(wei: Union[str, float]) -> float:
     """
     """
+
+    # Convert wei represented as a hex string to Ether
     if isinstance(wei, str) and is_hexadecimal(wei):
         decimal_wei = int(wei, 16)
-        assert decimal_wei >=0
+        assert decimal_wei >= 0.
 
         return decimal_wei / (10**18)
 
-    elif isinstance(wei, float):
-        assert wei >= 0
+    # Convert wei represented as a float to Ether
+    assert wei >= 0.
 
-        return wei / (10**18)
+    return wei / (10**18)
