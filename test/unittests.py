@@ -2,6 +2,8 @@ from re import S
 import unittest
 import pandas as pd
 
+import requests
+
 import onchain
 from onchain.utils import (
     get_alchemy_request_url,
@@ -11,6 +13,7 @@ from onchain.utils import (
     get_latest_block,
 )
 
+session = requests.Session()
 alchemy_request_url = get_alchemy_request_url()
 
 vitalik_address = "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045"
@@ -51,22 +54,20 @@ class TestRunner(unittest.TestCase):
     # API Function Tests
     def test_get_latest_block(self):
         """"""
-        self.assertIsInstance(get_latest_block(alchemy_request_url), str)
+        self.assertIsInstance(get_latest_block(alchemy_request_url, session), str)
 
     def test_get_balance_malformed_address(self):
         """Testing get_balance with an invalid address"""
-        res = get_balance("test", alchemy_request_url)
-        self.assertIsNone(res)
+        self.assertIsNone(get_balance("test", alchemy_request_url, session))
 
     def test_get_balance_valid_address(self):
         """Testing get_balance with a valid address"""
-        res = get_balance(vitalik_address, alchemy_request_url)
+        res = get_balance(vitalik_address, alchemy_request_url, session)
         self.assertIsInstance(res, float)
 
     def test_get_balance_malformed_block_number(self):
-        """Testing get_balance with an block number"""
-        res = get_balance(vitalik_address, alchemy_request_url, block_num = "0x-1")
-        self.assertIsNone(res)
+        """Testing get_balance with an invalid block number"""
+        self.assertIsNone(get_balance(vitalik_address, alchemy_request_url, session, block_num = "0x-1"))
 
     # Program output tests
     def assert_output_type(self):

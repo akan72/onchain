@@ -79,11 +79,10 @@ def validate_input_address(address: str) -> Optional[str]:
             return address
 
     # TODO: Potentially an ENS address, can use the Web3 API for this
-    print(f"'{address}' is not a valid address!")
     return None
 
 
-def get_latest_block(alchemy_request_url: str) -> Optional[str]:
+def get_latest_block(alchemy_request_url: str, session: requests.Session) -> Optional[str]:
     """
     """
     payload = {
@@ -93,24 +92,23 @@ def get_latest_block(alchemy_request_url: str) -> Optional[str]:
         "params": [],
     }
 
-    response = requests.post(alchemy_request_url, json=payload)
-    response_json = response.json()
+    try:
+        response = session.post(alchemy_request_url, json=payload)
+        response.raise_for_status()
 
-    # Sometimes Alchemy will still return 200 when an error is thrown
-    if response.status_code == 200 and 'error' not in response_json:
-        latest_block = response_json['result']
+        latest_block = response.json()['result']
 
         print(f"Latest block as of time {str(datetime.now())} is {latest_block}")
         return latest_block
-
-    if "error" in response_json:
-        print(f"Status Code {response.status_code} returned with error: {response_json['error']}")
-    return None
+    except requests.exceptions.HTTPError as e:
+        print(e)
+        return None
 
 
 def get_balance(
     address: str,
     alchemy_request_url: str,
+    session: requests.Session,
     block_num: str = "latest"
 ) -> Optional[float]:
     """Get the current balance of an address in Ether
@@ -125,22 +123,23 @@ def get_balance(
         ]
     }
 
-    response = requests.post(alchemy_request_url, json=payload)
-    response_json = response.json()
+    try:
+        response = session.post(alchemy_request_url, json=payload)
+        response.raise_for_status()
+        response_json = response.json()
 
-    # Sometimes Alchemy will still return 200 when an error is thrown
-    if response.status_code == 200 and 'error' not in response_json:
+        # Sometimes Alchemy will still return 200 when an error is thrown
+        # for this method, so we need to do some explicit checks
+        if response.status_code == '200' and 'error' in response_json or 'result' not in response_json:
+            print(f"Status Code {response.status_code} returned with error: {response_json}")
+            return None
+
         eth_result = convert_wei_to_ether(response_json['result'])
 
-        print(f"Ether balance as of block {block_num} for {address} is {eth_result} Ether")
         return eth_result
-
-    # Assuming that if a status code other than 200 is returned, there has been an error
-    print(f"Status Code {response.status_code} returned when fetching balance for {address}")
-
-    if "error" in response_json:
-        print(f"Error {response_json['error']}")
-    return None
+    except requests.exceptions.HTTPError as e:
+        print(e)
+        return None
 
 
 def convert_wei_to_ether(wei: Union[str, float]) -> float:
