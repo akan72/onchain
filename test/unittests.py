@@ -11,6 +11,7 @@ from onchain.utils import (
     validate_input_address,
     get_balance,
     get_latest_block,
+    get_transaction_history,
 )
 
 session = requests.Session()
@@ -58,16 +59,40 @@ class TestRunner(unittest.TestCase):
 
     def test_get_balance_malformed_address(self):
         """Testing get_balance with an invalid address"""
-        self.assertIsNone(get_balance("test", alchemy_request_url, session))
+        self.assertIsNone(get_balance("test", alchemy_request_url, session, "latest"))
 
     def test_get_balance_valid_address(self):
         """Testing get_balance with a valid address"""
-        res = get_balance(vitalik_address, alchemy_request_url, session)
+        res = get_balance(vitalik_address, alchemy_request_url, session, "latest")
         self.assertIsInstance(res, float)
 
     def test_get_balance_malformed_block_number(self):
         """Testing get_balance with an invalid block number"""
         self.assertIsNone(get_balance(vitalik_address, alchemy_request_url, session, block_num = "0x-1"))
+
+    def test_get_transaction_history_malformed_block_number(self):
+        """Calling get_transaction_history with a malformed block number"""
+        self.assertIsNone(
+            get_transaction_history(
+                vitalik_address,
+                alchemy_request_url,
+                is_from=True,
+                session=session,
+                block_num="0x-1")
+            )
+
+    def test_get_transaction_history(self):
+        """Calling get_transaction_history on the latest block"""
+        self.assertIsInstance(
+            get_transaction_history(
+                vitalik_address,
+                alchemy_request_url,
+                is_from=True,
+                session=session,
+                block_num="latest",
+            ),
+            list
+        )
 
     # Program output tests
     def assert_output_type(self):
