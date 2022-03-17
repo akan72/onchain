@@ -8,6 +8,7 @@ from datetime import datetime
 from typing import Optional, Union
 
 import requests
+import pandas as pd
 
 from onchain import config
 
@@ -191,6 +192,19 @@ def get_transaction_history(
     except requests.exceptions.HTTPError as e:
         print(e)
         return None
+
+def dedupe_transaction_history(df: pd.DataFrame) -> pd.DataFrame:
+    """Dedup the full transaction history dataframe after
+    concatenating both the "from" and "to" dfs
+
+    Args:
+        df: Input DataFrame of transactions to be sanitized
+
+    Returns:
+        DataFrame deduped across transaction hash
+    """
+
+    return df.drop_duplicates(subset=['hash'], keep='last')
 
 def convert_wei_to_ether(wei: Union[str, float]) -> float:
     """
