@@ -2,3 +2,4 @@ pandas==1.4.1
 pylint==2.12.2
 mypy==0.941
 requests==2.27.1
+jupyter==1.0.0
