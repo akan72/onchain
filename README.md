@@ -53,3 +53,16 @@ Deactivate the venv when we're done:
 ```{bash}
 deactivate
 ```
+
+## Next Steps
+
+- Allow for CLI-based input of addresses. Users would be able to pass
+  them in from the command line or through a CSV file.
+- CSV output support for the summary DataFrames
+- Ability to query transaction history from a custom start block
+- Support for ENS lookup instead of just hex addresses
+- Support for ENS721 and ERC1155 balances by parsing the relevant contracts
+- Make setup easier and create a proper package using `setuptools`
+- Implement pagination for transaction history. Right now we're limited to 10,000 results per call
+- Add a proper logger instead of using print statements
+- Create a dashboard using Streamlit or a simple Flask webapp to display results
