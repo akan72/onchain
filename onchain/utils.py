@@ -13,17 +13,21 @@ import pandas as pd
 from onchain import config
 
 def get_alchemy_request_url() -> str:
-    """Build the request URL for querying Alchemy either through an
-    env variable or stored as a variable within config.py.
+    """Build the request URL for querying Alchemy
+
+    The API key can be env variable or stored as a variable within config.py.
 
     Returns:
         Request URL used to query Alchemy's API
     """
+
+    # Try env variable first
     try:
         alchemy_api_key = os.environ["ALCHEMY_API_KEY"]
     except KeyError:
         print("ALCHEMY_API_KEY env variable not set! Trying from config.py.")
 
+        # Try setting within config.py
         try:
             alchemy_api_key = config.ALCHEMY_API_KEY
         except AttributeError:
@@ -38,16 +42,19 @@ def get_alchemy_request_url() -> str:
 
 
 def is_hexadecimal(address: str) -> bool:
-    """Determine if an input string is in hexadecimal format.
-    Used for validating potential ETH addresses
+    """Determine if an input string is in hexadecimal format
+
+    Used for validating strings that are potentially Ethereum addresses
+    within various other utility functions.
 
     Args:
-        address: String to check
+        address: String to validate
 
     Returns:
         True if valid hex, else False
     """
 
+    # Determine if the string maps to an int in base 16.
     try:
         int(address, 16)
     except ValueError:
@@ -56,12 +63,15 @@ def is_hexadecimal(address: str) -> bool:
 
 
 def validate_input_address(address: str) -> Optional[str]:
-    """Determine if an input address is a validate Ethereum address
+    """Determine if an input address is a valid Ethereum address
 
     Allowable formats:
-        - Hexadecimal address only
-        - Hexadecimal address prefixed by "0x"
+        - 40-digit hexadecimal address
+        - 42-digit hexadecimal address prefixed by "0x"
         - TODO: ENS Address
+
+    If the address is potentially an Ethereum address, conform it to the
+    42-digit setup that Alchemy expects.
 
     Args:
         address: String that may potentially be an Ethereum address
@@ -84,7 +94,20 @@ def validate_input_address(address: str) -> Optional[str]:
 
 
 def get_latest_block(alchemy_request_url: str, session: requests.Session) -> Optional[str]:
-    """
+    """Get the latest block on the network.
+
+    Computing the latest block and using it throughout other methods insures
+    for correctness if the network moves to another block while the script is running.
+
+    [Alchemy API docs](https://docs.alchemy.com/alchemy/apis/ethereum/eth-blocknumber)
+
+    Args:
+        alchemy_request_url: Request URL used to query Alchemy's API
+        session: Session object used for sharing state across requests
+
+    Returns:
+        Latest block, None if unsuccessful. If latest block returns None
+        due to a network error, the "latest" block is taken at time of API call.
     """
     payload = {
         "jsonrpc": "2.0",
@@ -113,6 +136,17 @@ def get_balance(
     block_num: str,
 ) -> Optional[float]:
     """Get the current balance of an address in Ether
+
+    [Alchemy API docs](https://docs.alchemy.com/alchemy/apis/ethereum/eth_getbalance)
+
+    Args:
+        address: Address for which we want to compute the Ether balance
+        alchemy_request_url: Request URL used to query Alchemy's API
+        session: Session object used for sharing state across requests
+        block_num: Block number as of which we want to compute the balance
+
+    Returns:
+        Balance of the address in ether at the block that we want
     """
     payload = {
         "jsonrpc": "2.0",
@@ -157,7 +191,20 @@ def get_transaction_history(
 ) -> Optional[List]:
     """Parse the transaction history for a given address.
 
-    Includes both completed and failed transactions.
+    Includes both completed and failed transactions. Used downstream to compute
+    all of the transactions "from" and "to" and address
+
+    [Alchemy API docs](https://docs.alchemy.com/alchemy/enhanced-apis/transfers-api)
+
+    Args:
+        address: Address for which we want to compute the Ether balance
+        alchemy_request_url: Request URL used to query Alchemy's API
+        is_from: Flag signaling whether we want transactions "from" or "to" an address
+        session: Session object used for sharing state across requests
+        block_num: Block number as of which we want to compute the balance
+
+    Returns:
+        List of transaction results to be passed to pandas
     """
 
     if is_from:
@@ -216,7 +263,16 @@ def dedupe_transaction_history(df: pd.DataFrame) -> pd.DataFrame:
     return df.drop_duplicates(subset=['hash'], keep='last')
 
 def sanitize_transaction_history(df: pd.DataFrame) -> pd.DataFrame:
-    """
+    """Sanitize the transaction history of an address after hitting Alchemy
+
+    Convert the block number from hex to base 10 int.
+    Dedup transactions based upon hash.
+
+    Args:
+        df: DataFrame created directly off of dict result from Alchemy's API
+
+    Returns:
+        Sanitized DataFrame
     """
 
     # Convert the block number from hex to integer. Sort by block # descending.
@@ -229,7 +285,16 @@ def sanitize_transaction_history(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 def convert_wei_to_ether(wei: Union[str, float]) -> float:
-    """
+    """Convert from Wei to Ether
+
+    Wei can be represented as hex string or float
+
+    [Info on the units](https://www.investopedia.com/terms/w/wei.asp)
+
+    Args:
+        wei: Balance in wei
+    Returns
+        Balance in Ether
     """
 
     # Convert wei represented as a hex string to Ether
