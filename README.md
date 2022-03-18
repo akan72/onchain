@@ -66,3 +66,11 @@ deactivate
 - Implement pagination for transaction history. Right now we're limited to 10,000 results per call
 - Add a proper logger instead of using print statements
 - Create a dashboard using Streamlit or a simple Flask webapp to display results
+
+## Limitations
+
+- Transaction history results are limited by the API to a max of 10,000 results
+  (see Next Steps about pagination)
+- Final token balance only currently supports Ether an ERC20 token balances.
+  - Other types of transactions are shown within history, but latest balance is omitted.
+- Balance for some exotic methods like `contribute` here isn't supported ([Example tx](https://etherscan.io/tx/0x07fc483171eaed8aada2cd8cba878f1fd41832abd8b161fd9cf698d045ee0925))
