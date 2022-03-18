@@ -2,6 +2,17 @@
 
 Experimenting with on-chain data
 
+Given a list of Ethereum addresses, return a suite of statistics as of the latest block:
+
+- What is the address' Ether balance?
+- What is its ERC20 token balance?
+- How many transactions (both completed and failed) occurred where the address was sender or recipient?
+- Return the transaction history as a Pandas DataFrame
+
+Under the hood, we make use of [Alchemy's API](https://www.alchemy.com/)
+
+![Screenshot of example output](./example_output.png)
+
 ## Installation Instructions
 
 Clone the repo:
