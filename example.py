@@ -30,7 +30,7 @@ session = requests.Session()
 
 # Defining addresses that we want to query
 input_addresses = [
-    "0xBE5F037E9bDfeA1E5c3c815Eb4aDeB1D9AB0137B", 
+    "0xBE5F037E9bDfeA1E5c3c815Eb4aDeB1D9AB0137B",
     "0xB033F13BB4F1cAF484AB5c090F22bE425b2146B3",
 ]
 
@@ -57,7 +57,7 @@ asset_count_summary_output = {}
 
 # Main Driver code
 for address in input_addresses:
-    # Validate input addresses. If an address is invalid, 
+    # Validate input addresses. If an address is invalid,
     # skip to the next one that the user specified
     if not validate_input_address(address):
         print(f"Input string '{address}' is of the wrong format to be valid address! Skipping.")
@@ -65,13 +65,13 @@ for address in input_addresses:
 
     # If the address is valid, get it's ether balance at the latest block
     balance = get_balance(address, alchemy_request_url, session, block_num=latest_block)
-    
+
     # Only continue with remainder of the logic if get_balance executes successfully
     if balance is None:
         print(f"get_balance() request failed for address {address}!")
         print("Continuing to next address")
         continue
-        
+
     # Store the balance that we've computed
     balance_output[address] = balance
 
@@ -83,7 +83,7 @@ for address in input_addresses:
         session,
         latest_block,
     )
-    
+
     # Get the transactions that were sent TO the address
     transfers_to = get_transaction_history(
         address,
@@ -92,19 +92,19 @@ for address in input_addresses:
         session,
         latest_block,
     )
-    
+
     if transfers_to and not transfers_from:
         # If an address has been funded, but has made no "out" transactions
-        
+
         # Convert the block number from hex to integer. Sort by block # descending.
         df_to = pd.DataFrame.from_dict(transfers_to)
-        
+
         df_transaction_history = sanitize_transaction_history(df_to)
-        
+
         # Get the current balance for each asset.
-        df_asset_count = df_to.groupby('asset').sum('value') 
+        df_asset_count = df_to.groupby('asset').sum('value')
         df_asset_count.fillna(0, inplace=True)
-        
+
         df_asset_count.columns = ['current_balance']
     elif transfers_from and transfers_to:
         # If an address both has "from" and "to" transactions
@@ -114,7 +114,7 @@ for address in input_addresses:
         # Concatenate the "from" and "to" transactions into one dataframe
         df_transaction_history = pd.concat([df_from, df_to])
         df_transaction_history = sanitize_transaction_history(df_transaction_history)
-        
+
         # Get the current balance for each asset for the "from" and "to" sets separately
         df_from_asset_count = df_from.groupby('asset').sum('value')
         df_to_asset_count = df_to.groupby('asset').sum('value')
@@ -132,8 +132,8 @@ for address in input_addresses:
         # If the address doesn't have any "to" transactions, can't happen
         print(f"Transaction history parsing for address {address} failed! Continuing.")
         continue
-        
-    # Drop NFT metadata columns. 
+
+    # Drop NFT metadata columns.
     # ERC721 tx will stil appear in the output dataframe, but the count
     # will not be correct without doing some additional parsing.
     df_transaction_history = df_transaction_history.drop(['erc721TokenId', 'erc1155Metadata', 'tokenId'], axis = 1)
@@ -145,8 +145,8 @@ for address in input_addresses:
     # Set ETH current balance to previously computed balance value,
     # necessary without having to compute gas for all transactions
     df_asset_count[df_asset_count.index == 'ETH'] = balance_output[address]
-              
-        
+
+
     # Store the transaction history and asset count summary that we've computed
     transaction_history_output[address] = df_transaction_history
     asset_count_summary_output[address] = df_asset_count
