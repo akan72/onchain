@@ -38,6 +38,16 @@ export ALCHEMY_API_KEY=<ALCHEMY_API_KEY>
 os.environ['ALCHEMY_API_KEY'] = '<ALCHEMY_API_KEY>'
 ```
 
+## Running the code
+
+Run the script generated using `jupyter nbconvert`:
+
+```{bash}
+python3 example.py
+```
+
+Run the notebook directly by executing `jupyter notebook` and using the UI.
+
 Deactivate the venv when we're done:
 
 ```{bash}
