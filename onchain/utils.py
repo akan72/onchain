@@ -215,6 +215,19 @@ def dedupe_transaction_history(df: pd.DataFrame) -> pd.DataFrame:
 
     return df.drop_duplicates(subset=['hash'], keep='last')
 
+def sanitize_transaction_history(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    """
+
+    # Convert the block number from hex to integer. Sort by block # descending.
+    df['blockNum'] = df['blockNum'].apply(lambda x: int(x, 16))
+    df.sort_values(by = 'blockNum', ascending=False, inplace=True)
+
+    # Dedupe transactions on tx hash
+    df = dedupe_transaction_history(df).reset_index(drop=True)
+
+    return df
+
 def convert_wei_to_ether(wei: Union[str, float]) -> float:
     """
     """
